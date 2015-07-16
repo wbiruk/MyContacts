@@ -40,6 +40,8 @@
         
         
        
+        
+        
         personAsString = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonFirstNameProperty);
         NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonLastNameProperty);
         
