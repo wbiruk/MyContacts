@@ -11,55 +11,48 @@
 
 @interface ViewController ()
 
+@property (nonatomic) ABAddressBookRef addressBook;
+@property (strong, nonatomic) NSArray *allContacts;
 @property (strong, nonatomic) NSMutableArray *allContactsAsStrings;
+@property (strong, nonatomic) NSString *personAsString;
 
 @end
 
 @implementation ViewController
 
-
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, nil);
-    //ABRecordRef person;
-    NSString *personAsString;
-    self.allContactsAsStrings = [[NSMutableArray alloc] init];
-
-    NSArray *allContacts = (__bridge NSArray *)ABAddressBookCopyArrayOfAllPeople(addressBook);
+    self.addressBook = ABAddressBookCreateWithOptions(NULL, nil);
+    self.allContacts = (__bridge NSArray *)ABAddressBookCopyArrayOfAllPeople(self.addressBook);
     
-    for (int i = 0; i < [allContacts count]; i++){
+    self.allContactsAsStrings = [[NSMutableArray alloc] init];
+    for (int i = 0; i < [self.allContacts count]; i++){
         
-        //person = (__bridge ABRecordRef)allContacts[i];
-        //personAsString = (__bridge_transfer NSString *)ABRecordCopyValue(person, kABPersonFirstNameProperty);
-        //[personAsString stringByAppendingString:(__bridge_transfer NSString *)ABRecordCopyValue(person, kABPersonLastNameProperty)];
-        //[allContactsAsStrings addObject:personAsString];
+        // get first name and last name
+        self.personAsString = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)self.allContacts[i], kABPersonFirstNameProperty);
+        NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)self.allContacts[i], kABPersonLastNameProperty);
         
-        //[allContactsAsStrings addObject:(__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonFirstNameProperty)];
-        
-        
-       
-        
-        
-        personAsString = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonFirstNameProperty);
-        NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonLastNameProperty);
-        
-        personAsString = [personAsString stringByAppendingFormat:@" %@", lastName];
-        [self.allContactsAsStrings addObject:personAsString];
-        
-        
-        
+        // append last name to first name and this string to array
+        self.personAsString = [self.personAsString stringByAppendingFormat:@" %@", lastName];
+        [self.allContactsAsStrings addObject:self.personAsString];
     }
     
-    
+}
+
+- (IBAction)buttonSortTapped:(UIButton *)sender {
+    // sort alphabetically
+    [self.allContactsAsStrings sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
     
 }
+
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return [self.allContactsAsStrings count];
 }
+
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -74,6 +67,8 @@
     cell.textLabel.text = [self.allContactsAsStrings objectAtIndex:indexPath.row];
     return cell;
 }
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
