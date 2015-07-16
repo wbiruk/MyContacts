@@ -11,11 +11,13 @@
 
 @interface ViewController ()
 
+@property (strong, nonatomic) NSMutableArray *allContactsAsStrings;
+
 @end
 
 @implementation ViewController
 
-NSMutableArray *allContactsAsStrings;
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -23,10 +25,10 @@ NSMutableArray *allContactsAsStrings;
     ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, nil);
     //ABRecordRef person;
     NSString *personAsString;
-    
+    self.allContactsAsStrings = [[NSMutableArray alloc] init];
 
     NSArray *allContacts = (__bridge NSArray *)ABAddressBookCopyArrayOfAllPeople(addressBook);
-    allContactsAsStrings = [[NSMutableArray alloc] init];
+    
     for (int i = 0; i < [allContacts count]; i++){
         
         //person = (__bridge ABRecordRef)allContacts[i];
@@ -39,8 +41,10 @@ NSMutableArray *allContactsAsStrings;
         
        
         personAsString = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonFirstNameProperty);
-        [personAsString stringByAppendingFormat:@" %@", (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonLastNameProperty)];
-        [allContactsAsStrings addObject:personAsString];
+        NSString *lastName = (__bridge_transfer NSString *)ABRecordCopyValue((__bridge ABRecordRef)allContacts[i], kABPersonLastNameProperty);
+        
+        personAsString = [personAsString stringByAppendingFormat:@" %@", lastName];
+        [self.allContactsAsStrings addObject:personAsString];
         
         
         
@@ -52,7 +56,7 @@ NSMutableArray *allContactsAsStrings;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [allContactsAsStrings count];
+    return [self.allContactsAsStrings count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -65,7 +69,7 @@ NSMutableArray *allContactsAsStrings;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
     }
     
-    cell.textLabel.text = [allContactsAsStrings objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self.allContactsAsStrings objectAtIndex:indexPath.row];
     return cell;
 }
 
