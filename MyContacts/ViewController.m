@@ -15,6 +15,7 @@
 @property (strong, nonatomic) NSArray *allContacts;
 @property (strong, nonatomic) NSMutableArray *allContactsAsStrings;
 @property (strong, nonatomic) NSString *personAsString;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @end
 
@@ -43,12 +44,13 @@
 - (IBAction)buttonSortTapped:(UIButton *)sender {
     // sort alphabetically
     [self.allContactsAsStrings sortUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-    
+    [self.tableView reloadData];
 }
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    
     return [self.allContactsAsStrings count];
 }
 
